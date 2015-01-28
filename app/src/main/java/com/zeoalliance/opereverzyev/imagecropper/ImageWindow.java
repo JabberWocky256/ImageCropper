@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by opereverzyev on 28.01.15.
@@ -21,10 +23,12 @@ public class ImageWindow extends Activity {
     public static final String NAME_OF_EXTRA = "PATH";
     private ImageView windowImage;
     private String imagePath;
+    private final static String TAG = "myLogs";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.window_image);
+
         windowImage = (ImageView) findViewById(R.id.image);
 
         try {
@@ -34,8 +38,18 @@ public class ImageWindow extends Activity {
             finish();
         }
 
-        getImageBitmap(imagePath);
+        Calendar c = Calendar.getInstance();
+        int startTime = c.get(Calendar.MILLISECOND);
+        Log.i(TAG, "Start of image loading at time...");
 
+        ImageLoader imageLoader = new ImageLoader();
+        Bitmap imageBitmap = imageLoader.getImage(imagePath);
+
+        int endTime = c.get(Calendar.MILLISECOND);
+        Log.i(TAG, "Stop of image loading at time: " + (endTime - startTime));
+
+        windowImage.setImageBitmap(imageBitmap);
+        Log.i(TAG, "set bitmap to image: " + (c.get(Calendar.MILLISECOND) - endTime));
     }
 
     private String getImagePath() throws FileNotFoundException {
@@ -46,14 +60,5 @@ public class ImageWindow extends Activity {
             throw new FileNotFoundException("this path is wrong");
 
         return result;
-    }
-
-    private Bitmap getImageBitmap(String imagePath){
-        File file = new File(imagePath);
-
-        Long length = file.length();
-        Log.i("file length: ", length.toString());
-
-        return null;
     }
 }
